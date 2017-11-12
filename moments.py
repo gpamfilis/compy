@@ -7,11 +7,12 @@ import pandas as pd
 # import matplotlib.pyplot as plt
 # the saving format is as follows: /seed_#/xy_dp.txt
 
-data_directory = '/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/geomentry_v0/'
+data_directory = '/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/geometry_v1/'
 
 
 def get_seeds(directory):
-    seeds = [int(a.split('_')[1]) for a in os.listdir(directory)]
+    f  = os.listdir(directory)
+    seeds = [int(a.split('_')[1]) for a in f if '.DS_Store' not in a]
     return seeds
 
 
@@ -30,7 +31,7 @@ def zero_moment(pos):
     m0 = []
     for i in range(pos.shape[1]):
         x_data = pos[i]
-        particles_in_media = ((x_data >= 0) & (x_data != np.nan) & (x_data < .1)).sum()
+        particles_in_media = ((x_data >= 0) & (x_data != np.nan) & (x_data < 200)).sum()
         m0.append(particles_in_media)
     return m0
 
@@ -56,11 +57,11 @@ def zero_moment_compute_and_save(seeds, paths, time, files):
         for s, seed in enumerate(seeds):
             fil = paths[str(seed)][f]
             print(file_.split('/')[-1])
-            par = particles.Particles(fil, dimension=2, time_start=0, time_end=4, time_step=500)
+            par = particles.Particles(fil, dimension=2, time_start=0, time_end=2500, time_step=2)
             m0 = zero_moment(par.qx)
             m0s.append(m0)
         df = pd.DataFrame(np.array(m0s).T, columns=[str(s) for s in seeds], index=time)
-        df.to_csv('/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/data/m0/' + file_.split('/')[-1])
+        df.to_csv('/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/data_v1/m0/' + file_.split('/')[-1])
 
 
 def nth_moment_compute_and_save(nth, seeds, paths, time, files):\
@@ -72,13 +73,13 @@ def nth_moment_compute_and_save(nth, seeds, paths, time, files):\
         for s, seed in enumerate(seeds):
             fil = paths[str(seed)][f]
             print(file_.split('/')[-1])
-            par = particles.Particles(fil, dimension=2, time_start=0, time_end=4, time_step=500)
-            x = par.qx[par.qx < 0.1]
+            par = particles.Particles(fil, dimension=2, time_start=0, time_end=2500, time_step=2)
+            x = par.qx[par.qx < 200]
             m0 = zero_moment(par.qx)
-            mnx = mom(nth, position=x, time=time, m0=m0, norm=True)
+            mnx = mom(nth, position=x, time=time, m0=m0, norm=False)/1000
             mnxs.append(mnx)
         df = pd.DataFrame(np.array(mnxs).T, columns=[str(s) for s in seeds], index=time)
-        df.to_csv('/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/data/m'+str(nth)+'x/' +
+        df.to_csv('/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/data_v1/m'+str(nth)+'x/' +
                   file_.split('/')[-1])
     print('Y-DIRECTION')
     for f, file_ in enumerate(files):
@@ -86,21 +87,21 @@ def nth_moment_compute_and_save(nth, seeds, paths, time, files):\
         for s, seed in enumerate(seeds):
             fil = paths[str(seed)][f]
             print(file_.split('/')[-1])
-            par = particles.Particles(fil, dimension=2, time_start=0, time_end=4, time_step=500)
-            y = par.qy[par.qx < 0.1]
+            par = particles.Particles(fil, dimension=2, time_start=0, time_end=2500, time_step=2)
+            y = par.qy[par.qx < 200]
             m0 = zero_moment(par.qx)
-            mny = mom(nth, position=y, time=time, m0=m0, norm=True)
+            mny = mom(nth, position=y, time=time, m0=m0, norm=False)/1000
             mnys.append(mny)
         df = pd.DataFrame(np.array(mnys).T, columns=[str(s) for s in seeds], index=time)
-        df.to_csv('/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/data/m'+str(nth)+'y/' +
+        df.to_csv('/Users/georgepamfilis/Dropbox/THESIS/comsol_project/DATA/micromodel/data_v1/m'+str(nth)+'y/' +
                   file_.split('/')[-1])
 
 
 if __name__ == '__main__':
     seeds = get_seeds(data_directory)
     paths = get_data_paths(data_directory, seeds)
-    time = np.arange(0, 4 + 1 / 500., 1 / 500.)
-    files = paths['100']
+    time = np.arange(0, 2500 + 2, 2)
+    files = paths['1']
     zero_moment_compute_and_save(seeds, paths, time, files)
     nth_moment_compute_and_save(1, seeds, paths, time, files)
     nth_moment_compute_and_save(2, seeds, paths, time, files)
