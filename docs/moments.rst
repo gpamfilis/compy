@@ -4,21 +4,29 @@ This is the Moments documentation.
 .. module:: moments
 
 
-This is the SpatialMoments API.
--------------------------------
-.. autoclass:: SpatialMoments
-   :members:
-   :undoc-members:
-   :member-order:
-   :private-members:
-   :special-members:
+Get the seeds
+-------------
+.. autofunction:: get_seeds
+
+Get the paths
+-------------
+.. autofunction:: get_data_paths
+
+Zero Moments
+------------
+.. autofunction:: zero_moment
+
+nth moment
+----------
+.. autofunction:: mom
 
 
-This is the Moments API.
-------------------------
-.. autoclass:: Moments
-   :members:
-   :undoc-members:
-   :member-order:
-   :private-members:
-   :special-members:
+Compute and save zero
+---------------------
+.. autofunction:: zero_moment_compute_and_save
+
+
+Compute and Save
+----------------
+.. autofunction:: nth_moment_compute_and_save
+
